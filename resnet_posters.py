@@ -19,7 +19,13 @@ x = model.output
 x = GlobalAveragePooling2D()(x)
 predictions = Dense(26, activation='sigmoid')(x)
 genre_model = Model(inputs = model.input, outputs = predictions)
-genre_model.compile(loss='binary_crossentropy', optimizer='sgd')
+#genre_model.compile(loss='binary_crossentropy', optimizer='sgd')
+#genre_model.compile(optimizer='sgd')
+genre_model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy"])
+#Freeze all but the last layer
+for layer in genre_model.layers[:-1]:
+    layer.trainable = False
+
 #%%
 #
 # In this section, we distribute the images across three directories, 
@@ -34,7 +40,9 @@ Y = pd.read_csv(data_path + 'genres.csv')
 #%%
 def prep_images(df, data_dir, data_class):
     '''splits the data into a different directory per genre.'''
-    for genre in df.columns.tolist():
+    genre_list = df.columns.tolist()
+    genre_list.remove('id')
+    for genre in genre_list:
         path = data_dir + data_class
         new_dir = os.path.join(path, genre)
         os.mkdir(new_dir)
@@ -45,31 +53,27 @@ def prep_images(df, data_dir, data_class):
         movies.apply(lambda x: shutil.copyfile(x['src'], x['dest']), axis=1)
         print(genre + ' had ' + str(len(movies)) + ' posters.')
 #%%
+#Only run the one time.
 train_data = Y[:200]
 prep_images(train_data, data_path, 'train/')
 #%%
-
-
 train_datagen = ImageDataGenerator(rescale=1./255)
-validation_datagen = ImageDataGenerator(rescale=1./255)
-test_datagen = ImageDataGenerator(rescale=1./255)
+#validation_datagen = ImageDataGenerator(rescale=1./255)
+#test_datagen = ImageDataGenerator(rescale=1./255)
 
-train_generator = train_datagen.flow_from_directory(train_dir,
-    target_size=(268, 182),
-    batch_size=10,
-    class_mode='binary')
+train_generator = train_datagen.flow_from_directory(train_path,
+    target_size=(268, 182), batch_size=16, class_mode=None)
+
 for data_batch, labels_batch in train_generator:
     print('data batch shape:', data_batch.shape)
     print('labels batch shape:', labels_batch.shape)
     break
 
-validation_generator = train_datagen.flow_from_directory(validation_dir,
-    target_size=(268, 182),
-    batch_size=10,
-    class_mode='binary')
+#validation_generator = train_datagen.flow_from_directory(validation_dir,
+#    target_size=(268, 182),
+#    batch_size=10,
+#    class_mode='binary')
 
 history = genre_model.fit_generator(train_generator,
     steps_per_epoch=100,
-    epochs=30,
-    validation_data=validation_generator,
-    validation_steps=50)
+    epochs=2)
