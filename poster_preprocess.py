@@ -36,7 +36,7 @@ if __name__ == ("__main__"):
     data_path = sys.argv[1]
     train_path = data_path + 'train/'
     Y = pd.read_csv(data_path + 'genres.csv')
-    test_data = Y[:400]
+    test_data = Y[:1000]
     prep_images(test_data, data_path, 'train/')
 #%%
 
