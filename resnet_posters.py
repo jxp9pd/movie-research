@@ -1,4 +1,5 @@
 import sys
+import tensorflow
 import os; os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras.applications import resnet50
 from keras.layers import Dense, GlobalAveragePooling2D
