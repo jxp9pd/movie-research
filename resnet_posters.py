@@ -7,6 +7,7 @@ from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/train/'
+#''/Users/johnpentakalos/Posters/train/''
 #export PATH=/af12/jxp9pd/anaconda3/bin:$PATH
 # Import Tensorflow with multiprocessing
 if K.backend() == 'tensorflow':
@@ -21,18 +22,18 @@ x = model.output
 x = GlobalAveragePooling2D()(x)
 predictions = Dense(26, activation='sigmoid')(x)
 genre_model = Model(inputs=model.input, outputs=predictions)
-genre_model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy"])
+
 #Freeze all but the last layer
 for layer in genre_model.layers[:-1]:
     layer.trainable = False
-
+genre_model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy"])
 #%%
 train_datagen = ImageDataGenerator(rescale=1./255)
 #validation_datagen = ImageDataGenerator(rescale=1./255)
 #test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(sys.argv[1],
-    target_size=(268, 182), batch_size=32, class_mode=None)
+    target_size=(268, 182), batch_size=32, class_mode='categorical')
 
 
 history = genre_model.fit_generator(train_generator, steps_per_epoch=100, epochs=2)
