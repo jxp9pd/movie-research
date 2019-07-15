@@ -6,6 +6,7 @@ from keras.layers import Dense, GlobalAveragePooling2D
 from keras.models import Model
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
+from PIL import Image
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/train/'
 #''/Users/johnpentakalos/Posters/train/''
