@@ -8,7 +8,8 @@ from keras.preprocessing.image import ImageDataGenerator
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/train/'
 #''/Users/johnpentakalos/Posters/train/''
-#export PATH=/af12/jxp9pd/anaconda3/bin:$PATH
+#source ~/pythonenv/bin/activate
+#export PATH=$HOME/bin:$PATH
 # Import Tensorflow with multiprocessing
 if K.backend() == 'tensorflow':
     K.set_image_dim_ordering("tf")
