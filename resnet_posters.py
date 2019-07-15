@@ -1,10 +1,13 @@
 import sys
+import os; os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras.applications import resnet50
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.models import Model
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
+#'/af12/jxp9pd/Posters/train/'
+#export PATH=/af12/jxp9pd/anaconda3/bin:$PATH
 # Import Tensorflow with multiprocessing
 if K.backend() == 'tensorflow':
     K.set_image_dim_ordering("tf")
