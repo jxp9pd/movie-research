@@ -6,6 +6,8 @@ from keras.layers import Dense, GlobalAveragePooling2D
 from keras.models import Model
 from keras import backend as K
 from keras_preprocessing.image import ImageDataGenerator
+import multilabel_process
+
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/train/'
 #'/Users/johnpentakalos/Posters/train/'
@@ -32,6 +34,8 @@ for layer in genre_model.layers[:-1]:
 genre_model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy", \
         "categorical_accuracy"])
 #%%
+data_dir = '/Users/johnpentakalos/Posters/'
+#%%
 #Retrain model to use 
 #data_dir = sys.argv[1]
 data_dir = '/Users/johnpentakalos/Posters/'
@@ -42,7 +46,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 train_generator = train_datagen.flow_from_directory(data_dir + 'train/', \
     target_size=(268, 182), batch_size=32, class_mode='categorical')
 
-history = genre_model.fit_generator(train_generator, steps_per_epoch=30, epochs=3)
+history = genre_model.fit_generator(train_generator, steps_per_epoch=30, epochs=5)
 
 #for data_batch, labels_batch in train_generator:
 #    print('data batch shape:', data_batch.shape)
@@ -71,3 +75,5 @@ actual = genre_df.loc[predictions_df.index]
 actual - predictions_df
 #generates accuracy by genre
 abs(actual-predictions_df).sum()
+#Total error sum
+abs(actual-predictions_df).sum().sum()
