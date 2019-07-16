@@ -31,13 +31,14 @@ for layer in genre_model.layers[:-1]:
     layer.trainable = False
 genre_model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy"])
 #%%
+data_dir = sys.argv[1]
+
 train_datagen = ImageDataGenerator(rescale=1./255)
-#validation_datagen = ImageDataGenerator(rescale=1./255)
+validation_datagen = ImageDataGenerator(rescale=1./255)
 #test_datagen = ImageDataGenerator(rescale=1./255)
 
-train_generator = train_datagen.flow_from_directory(sys.argv[1],
+train_generator = train_datagen.flow_from_directory(data_dir + 'train/',
     target_size=(268, 182), batch_size=32, class_mode='categorical')
-
 
 history = genre_model.fit_generator(train_generator, steps_per_epoch=100, epochs=2)
 
@@ -45,7 +46,7 @@ history = genre_model.fit_generator(train_generator, steps_per_epoch=100, epochs
 #    print('data batch shape:', data_batch.shape)
 #    print('labels batch shape:', labels_batch.shape)
 #    break
-#validation_generator = train_datagen.flow_from_directory(validation_dir,
-#    target_size=(268, 182),
-#    batch_size=10,
-#    class_mode='binary')
+validation_generator = train_datagen.flow_from_directory(validation_dir,
+    target_size=(268, 182),
+    batch_size=10,
+    class_mode='binary')

@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import pandas as pd
+from sklearn.model_selection import train_test_split
 #%%
 def prep_images(df, data_dir, data_class):
     '''splits the data into a different directory per genre.'''
@@ -36,7 +37,10 @@ if __name__ == "__main__":
     data_path = sys.argv[1]
     train_path = data_path + 'train/'
     Y = pd.read_csv(data_path + 'genres.csv')
-    test_data = Y[:1000]
-    prep_images(test_data, data_path, 'train/')
+    data = Y[:2500]
+    train_data, test_data = train_test_split(data, test_size=0.2, random_state=1)
+    
+    prep_images(data, data_path, 'train/')
+    prep_images(data, data_path, 'test/')
 #%%
 
