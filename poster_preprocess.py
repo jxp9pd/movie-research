@@ -3,6 +3,7 @@ import shutil
 import sys
 import pandas as pd
 from sklearn.model_selection import train_test_split
+#'/af12/jxp9pd/Posters/'
 #%%
 def prep_images(df, data_dir, data_class):
     '''splits the data into a different directory per genre.'''
@@ -32,7 +33,7 @@ def prep_images(df, data_dir, data_class):
         print(genre + ' has ' + str(len(os.listdir(new_dir))) + ' posters.')
 
 #%%
-if __name__ == "__main__":
+if __name__ == ("__main__"):
     print(sys.argv[1])
     data_path = sys.argv[1]
     train_path = data_path + 'train/'
