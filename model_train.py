@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+import numpy as np
 import os; os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras.applications import resnet50
 from keras.layers import Dense, GlobalAveragePooling2D
@@ -36,5 +37,12 @@ model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy", 
 '''Load in poster data in a usable format'''
 #data_path = sys.argv[1]
 data_path = '/Users/johnpentakalos/Posters/'
-train_posters, validate_posters, test_posters = multilabel_process.img_process(data_path, 3000)
-
+X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
+    multilabel_process.img_process(data_path, 3000)
+#%%
+'''Model training'''
+model.fit(X_train, Y_train, steps_per_epoch=30, epochs=2, validation_data=\
+          (X_validate, Y_validate), batch_size=32)
+#model.fit(X_train, Y_train, epochs=2, batch_size=32)
+#%%
+'''Model Predictions'''
