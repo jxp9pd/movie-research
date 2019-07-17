@@ -1,3 +1,4 @@
+'''Loads in images, pre-processes them for keras, splits data into train test validate'''
 from keras.preprocessing import image
 import pandas as pd
 import numpy as np
@@ -24,17 +25,18 @@ def process_imgs(movie_df, data_dir):
 
 #%%
 def img_process(data_path, size):
+    '''Splits the data up into Train, Test, Validate. Then makes the succesive
+    calls to process_imgs'''
     #data_path = '/Users/johnpentakalos/Posters/'
-    Y = pd.read_csv(data_path + 'genres.csv')[:size]
-    train_data, double_data = train_test_split(Y, test_size=0.2, random_state=1)
+    genres = pd.read_csv(data_path + 'genres.csv')[:size]
+    train_data, double_data = train_test_split(genres, test_size=0.2, random_state=1)
     validate_data, test_data = train_test_split(double_data, test_size=0.5, random_state=1)
    # pdb.set_trace()
-    X_train = process_imgs(train_data, data_path)
-    Y_train = np.array(train_data.drop('id', axis=1))
-    X_validate = process_imgs(validate_data, data_path)
-    Y_validate = np.array(validate_data.drop('id', axis=1))
-    X_test = process_imgs(test_data, data_path)
-    Y_test = np.array(test_data.drop('id', axis=1))
+    x_train = process_imgs(train_data, data_path)
+    y_train = np.array(train_data.drop('id', axis=1))
+    x_validate = process_imgs(validate_data, data_path)
+    y_validate = np.array(validate_data.drop('id', axis=1))
+    x_test = process_imgs(test_data, data_path)
+    y_test = np.array(test_data.drop('id', axis=1))
 
-    return X_train, Y_train, X_validate, Y_validate, X_test, Y_test
-
+    return x_train, y_train, x_validate, y_validate, x_test, y_test
