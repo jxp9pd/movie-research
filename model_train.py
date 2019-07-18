@@ -4,8 +4,9 @@ import multilabel_process
 from keras.applications import resnet50
 from keras import backend as K
 from keras.layers import Dense, GlobalAveragePooling2D
-from keras.models import Model
+from keras.models import Model, load_model
 import pandas as pd
+import matplotlib.pyplot as plt
 
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/train/'
@@ -36,8 +37,7 @@ def load_resnet(finetune):
     return model
 #%%
 model = load_resnet(True)
-model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["accuracy", \
-        "categorical_accuracy"])
+model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["categorical_accuracy"])
 #%%
 #Load in poster data in a usable format
 #data_path = sys.argv[1]
@@ -46,8 +46,9 @@ X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
     multilabel_process.img_process(DATA_PATH, 3000)
 #%%
 #Model Training
-model.fit(X_train, Y_train, steps_per_epoch=30, epochs=2, validation_data=\
-          (X_validate, Y_validate), batch_size=32)
+history = model.fit(X_train, Y_train, epochs=3, validation_data=(X_validate, Y_validate),\
+          batch_size=32)
+model.save('model2400_3.h5') 
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
 #Model Predictions
