@@ -42,8 +42,8 @@ print ('Pretrained Resnet model loaded and compiled.')
 #%%
 #Load in poster data in a usable format
 #data_path = sys.argv[1]
-#DATA_PATH = '/Users/johnpentakalos/Posters/'
-DATA_PATH = sys.argv[1]
+DATA_PATH = '/Users/johnpentakalos/Posters/'
+#DATA_PATH = sys.argv[1]
 X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
     multilabel_process.img_process(DATA_PATH, 5000)
 print('Poster data loaded and split into train validate test.')
@@ -52,11 +52,18 @@ print ('Validate set has dimensions: ' + str(X_validate.shape))
 print ('Test set has dimensions: ' + str(X_test.shape))
 #%%
 #Model Training
-history = model.fit(X_train, Y_train, epochs=5, validation_data=(X_validate, Y_validate),\
+history = model.fit(X_train, Y_train, epochs=1, validation_data=(X_validate, Y_validate),\
           batch_size=32)
 model.save(DATA_PATH + 'model2400_3.h5')
 print('Model trained and saved.')
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
-#Model Predictions
+#Make Model Predictions
+predictions = model.predict(X_test)
+#%%
+#Convert predictions into suitable dataframe
+genre_df = pd.read_csv(DATA_PATH + 'genres.csv')
+genre_df.set_index('id', inplace=True)
+genre_list = genre_df.columns.values
 
+predictions_df = pd.DataFrame(predictions, columns=genre_list)

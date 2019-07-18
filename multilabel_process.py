@@ -29,6 +29,7 @@ def img_process(data_path, size):
     calls to process_imgs'''
     #data_path = '/Users/johnpentakalos/Posters/'
     genres = pd.read_csv(data_path + 'genres.csv')[:size]
+    genres = genres.sample(frac=1)
     train_data, double_data = train_test_split(genres, test_size=0.2, random_state=1)
     validate_data, test_data = train_test_split(double_data, test_size=0.5, random_state=1)
    # pdb.set_trace()
@@ -37,6 +38,6 @@ def img_process(data_path, size):
     x_validate = process_imgs(validate_data, data_path)
     y_validate = np.array(validate_data.drop('id', axis=1))
     x_test = process_imgs(test_data, data_path)
-    y_test = np.array(test_data.drop('id', axis=1))
+    y_test = test_data.set_index('id')
 
     return x_train, y_train, x_validate, y_validate, x_test, y_test
