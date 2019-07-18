@@ -41,14 +41,16 @@ model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["categorical
 #%%
 #Load in poster data in a usable format
 #data_path = sys.argv[1]
-DATA_PATH = '/Users/johnpentakalos/Posters/'
+#DATA_PATH = '/Users/johnpentakalos/Posters/'
+DATA_PATH = sys.argv[1]
 X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
-    multilabel_process.img_process(DATA_PATH, 3000)
+    multilabel_process.img_process(DATA_PATH, 5000)
 #%%
 #Model Training
-history = model.fit(X_train, Y_train, epochs=3, validation_data=(X_validate, Y_validate),\
+history = model.fit(X_train, Y_train, epochs=5, validation_data=(X_validate, Y_validate),\
           batch_size=32)
 model.save('model2400_3.h5') 
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
 #Model Predictions
+
