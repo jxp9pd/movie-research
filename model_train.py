@@ -55,7 +55,7 @@ print ('Test set has dimensions: ' + str(X_test.shape))
 history = model.fit(X_train, Y_train, epochs=5, validation_data=(X_validate, Y_validate),\
           batch_size=32)
 model.save(DATA_PATH + 'model2400_3.h5')
-print('Model trained and saved!')
+print('Model trained and saved.')
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
 #Model Predictions
