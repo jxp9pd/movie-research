@@ -6,7 +6,6 @@ from keras import backend as K
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.models import Model, load_model
 import pandas as pd
-import matplotlib.pyplot as plt
 
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/'
@@ -36,9 +35,10 @@ def load_resnet(finetune):
         layer.trainable = False
     return model
 #%%
-model = load_resnet(True)
-model.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["categorical_accuracy"])
-print ('Pretrained Resnet model loaded and compiled.')
+MODEL = load_resnet(True)
+#MODEL.compile(loss="binary_crossentropy", optimizer='sgd', metrics=["categorical_accuracy"])
+MODEL.compile(loss="binary_crossentropy", optimizer='adam', metrics=["categorical_accuracy"])
+print('Pretrained Resnet model loaded and compiled.')
 #%%
 #Load in poster data in a usable format
 #data_path = sys.argv[1]
@@ -47,23 +47,27 @@ DATA_PATH = '/Users/johnpentakalos/Posters/'
 X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
     multilabel_process.img_process(DATA_PATH, 5000)
 print('Poster data loaded and split into train validate test.')
-print ('Train set has dimensions: ' + str(X_train.shape))
-print ('Validate set has dimensions: ' + str(X_validate.shape))
-print ('Test set has dimensions: ' + str(X_test.shape))
+print('Train set has dimensions: ' + str(X_train.shape))
+print('Validate set has dimensions: ' + str(X_validate.shape))
+print('Test set has dimensions: ' + str(X_test.shape))
 #%%
 #Model Training
-history = model.fit(X_train, Y_train, epochs=1, validation_data=(X_validate, Y_validate),\
+history = MODEL.fit(X_train, Y_train, epochs=2, validation_data=(X_validate, Y_validate),\
           batch_size=32)
-model.save(DATA_PATH + 'model2400_3.h5')
+MODEL.save(DATA_PATH + 'model4000_3.h5')
 print('Model trained and saved.')
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
 #Make Model Predictions
-predictions = model.predict(X_test)
+RESULTS = MODEL.predict(X_test)
 #%%
 #Convert predictions into suitable dataframe
 genre_df = pd.read_csv(DATA_PATH + 'genres.csv')
 genre_df.set_index('id', inplace=True)
 genre_list = genre_df.columns.values
-
-predictions_df = pd.DataFrame(predictions, columns=genre_list)
+actual_df = pd.DataFrame(Y_test, columns=genre_list)
+predictions_df = pd.DataFrame(RESULTS, columns=genre_list)
+predictions_df[predictions_df < 0.5] = 0
+predictions_df[predictions_df > 0.5] = 1
+predictions_df.head()
+actual_df.head()

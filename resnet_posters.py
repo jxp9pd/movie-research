@@ -1,3 +1,4 @@
+'''Approach did not work for multi-labeling. Replaced by multilabel_process'''
 import sys
 import pandas as pd
 import os; os.environ['KERAS_BACKEND'] = 'tensorflow'
