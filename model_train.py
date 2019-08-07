@@ -8,7 +8,6 @@ from keras.layers import Dense, GlobalAveragePooling2D
 from keras.callbacks import ModelCheckpoint
 from keras.models import Model, load_model
 import pandas as pd
-
 #ssh jxp9pd@gpusrv04.cs.virginia.edu
 #'/af12/jxp9pd/Posters/'
 #'/Users/johnpentakalos/Posters/'
@@ -32,8 +31,8 @@ def load_resnet(finetune):
     link = GlobalAveragePooling2D()(link)
     predictions = Dense(26, activation='sigmoid')(link)
     model = Model(inputs=resnet_model.input, outputs=predictions)
-    #Freeze all but the last layer
-    for layer in model.layers[:-1]:
+    #Freeze all but the last specified layers.
+    for layer in model.layers[:-10]:
         layer.trainable = False
     return model
 #%%
@@ -47,7 +46,7 @@ print('Pretrained Resnet model loaded and compiled.')
 DATA_PATH = '/Users/johnpentakalos/Posters/'
 #DATA_PATH = sys.argv[1]
 X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
-    multilabel_process.img_process(DATA_PATH, 3000, 1999)
+    multilabel_process.img_process(DATA_PATH, 4000, 1999)
 filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, \
             save_best_only=True, mode='min')
@@ -61,7 +60,7 @@ print('Test set has dimensions: ' + str(X_test.shape))
 #Model Training
 history = MODEL.fit(X_train, Y_train, epochs=5, validation_data=(X_validate, Y_validate),\
           batch_size=32, callbacks=callbacks_list)
-MODEL.save(DATA_PATH + 'modelall_3.h5')
+MODEL.save(DATA_PATH + 'model4000_3_unfrozen.h5')
 print('Model trained and saved.')
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
@@ -70,13 +69,7 @@ RESULTS = MODEL.predict(X_test)
 print('Model predictions completed.')
 #%%
 #Convert predictions into suitable dataframe
-predictions_df, actual_df = model_eval.predict_df(Y_test, RESULTS, 0)
-genre_df = pd.read_csv(DATA_PATH + 'genres.csv')
-genre_df.set_index('id', inplace=True)
-genre_list = genre_df.columns.values
-actual_df = pd.DataFrame(Y_test, columns=genre_list)
-predictions_df = pd.DataFrame(RESULTS, columns=genre_list)
-predictions_df[predictions_df < 0.5] = 0
-predictions_df[predictions_df > 0.5] = 1
-predictions_df.head()
-actual_df.head()
+predictions_df, actual_df = model_eval.predict_df(Y_test, RESULTS, 0.5)
+#Print Precision rates.
+model_eval.get_precision(predictions_df, actual_df)
+model_eval.loss_curves(history, DATA_PATH, 'loss_4000_10', 'acc_4000_10')

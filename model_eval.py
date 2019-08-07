@@ -25,10 +25,17 @@ def get_precision(predictions_df, actual_df):
     '''Calculate example-based precision metric
     https://stackoverflow.com/questions/9004172/precision-recall-for-multiclass-multilabel-classification'''
     #positives = predictions_df[]
-    print ('Hello World')
-    
+    for genre in predictions_df.columns:
+        positives = predictions_df[genre][predictions_df[genre] == 1]
+        if len(positives) == 0:
+            print('No positives predicted for: ' + genre)
+        else:
+            ground_truth = actual_df.loc[positives.index][genre]
+            correct = ground_truth.sum()
+            print('Precision rate for ', genre, ': ' + str(correct/len(positives)))
+
 #%%
-def loss_curves(history, save_loc):
+def loss_curves(history, save_loc, loss_name, acc_name):
     '''Produces loss plots'''
     # summarize history for accuracy
     plt.plot(history.history['categorical_accuracy'])
@@ -37,7 +44,7 @@ def loss_curves(history, save_loc):
     plt.ylabel('accuracy')
     plt.xlabel('epochs')
     plt.legend(['train', 'val'], loc='upper left')
-    plt.savefig(save_loc + 'model_acc.png')
+    plt.savefig(save_loc + acc_name + '.png')
     plt.show()
     # summarize history for loss
     plt.plot(history.history['loss'])
@@ -46,7 +53,7 @@ def loss_curves(history, save_loc):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
-    plt.savefig(save_loc + 'model_loss.png')
+    plt.savefig(save_loc + loss_name + '.png')
     plt.show()
 #%%
 def open_img(file_name):
