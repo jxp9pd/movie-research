@@ -1,9 +1,11 @@
 '''This module handles the entire model training process.'''
-import sys
+#import sys
 import multilabel_process
+import model_eval
 from keras.applications import resnet50
 from keras import backend as K
 from keras.layers import Dense, GlobalAveragePooling2D
+from keras.callbacks import ModelCheckpoint
 from keras.models import Model, load_model
 import pandas as pd
 
@@ -45,23 +47,30 @@ print('Pretrained Resnet model loaded and compiled.')
 DATA_PATH = '/Users/johnpentakalos/Posters/'
 #DATA_PATH = sys.argv[1]
 X_train, Y_train, X_validate, Y_validate, X_test, Y_test = \
-    multilabel_process.img_process(DATA_PATH, 5000)
+    multilabel_process.img_process(DATA_PATH, 3000, 1999)
+filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, \
+            save_best_only=True, mode='min')
+callbacks_list = [checkpoint]
 print('Poster data loaded and split into train validate test.')
 print('Train set has dimensions: ' + str(X_train.shape))
 print('Validate set has dimensions: ' + str(X_validate.shape))
 print('Test set has dimensions: ' + str(X_test.shape))
+
 #%%
 #Model Training
-history = MODEL.fit(X_train, Y_train, epochs=2, validation_data=(X_validate, Y_validate),\
-          batch_size=32)
-MODEL.save(DATA_PATH + 'model4000_3.h5')
+history = MODEL.fit(X_train, Y_train, epochs=5, validation_data=(X_validate, Y_validate),\
+          batch_size=32, callbacks=callbacks_list)
+MODEL.save(DATA_PATH + 'modelall_3.h5')
 print('Model trained and saved.')
 #model.fit(X_train, Y_train, epochs=2, batch_size=32)
 #%%
 #Make Model Predictions
 RESULTS = MODEL.predict(X_test)
+print('Model predictions completed.')
 #%%
 #Convert predictions into suitable dataframe
+predictions_df, actual_df = model_eval.predict_df(Y_test, RESULTS, 0)
 genre_df = pd.read_csv(DATA_PATH + 'genres.csv')
 genre_df.set_index('id', inplace=True)
 genre_list = genre_df.columns.values

@@ -22,17 +22,34 @@ def process_imgs(movie_df, data_dir):
         imgs_processed.append(convert_image(img_url))
     #imgs_processed = image_list.apply(lambda x: convert_image(x))
     return np.array(imgs_processed)
+#%%
+def date_split(data_path, first_date, movies):
+    '''Trims to only include posters produced after the input date'''
+    full_df = pd.read_csv(data_path + 'movies_list.csv')
+    #Takes out just the unique IDs from the IMDB urls
+    full_df.index = full_df['movieurl'].str[26:-1]
+    full_df = full_df.loc[movies]
+    full_df['release_year'] = full_df.year.str[1:5]
+    #Trim non-dated posters
+    full_df = full_df[full_df['release_year'] != "????"]
+    full_df['release_year'] = full_df['release_year'].astype('int32')
+    full_df = full_df[full_df['release_year'] >= first_date]
+    #just need to return the list of movies.
+    return full_df.index
+    
 
 #%%
-def img_process(data_path, size):
+def img_process(data_path, size, year):
     '''Splits the data up into Train, Test, Validate. Then makes the succesive
     calls to process_imgs'''
-    #data_path = '/Users/johnpentakalos/Posters/'
     genres = pd.read_csv(data_path + 'genres.csv')[:size]
+    genres.index = genres['id']
+    valid_index = date_split(data_path, year, genres.index)
+    genres = genres.loc[valid_index].dropna()
+    #randomizes the order of the dataset
     genres = genres.sample(frac=1)
     train_data, double_data = train_test_split(genres, test_size=0.2, random_state=1)
     validate_data, test_data = train_test_split(double_data, test_size=0.5, random_state=1)
-   # pdb.set_trace()
     x_train = process_imgs(train_data, data_path)
     y_train = np.array(train_data.drop('id', axis=1))
     x_validate = process_imgs(validate_data, data_path)
@@ -41,3 +58,4 @@ def img_process(data_path, size):
     y_test = test_data.set_index('id')
 
     return x_train, y_train, x_validate, y_validate, x_test, y_test
+
