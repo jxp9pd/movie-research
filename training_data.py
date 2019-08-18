@@ -1,26 +1,27 @@
+'''Cleans training data.'''
 from os import listdir
 from os.path import isfile, join
 import pandas as pd
-import pdb
 pd.set_option('display.max_columns', 20)
 
-mypath = '/Users/johnpentakalos/Posters/poster_imgs'
-onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+DATA_PATH = '/Users/johnpentakalos/Posters/'
+onlyfiles = [f for f in listdir(DATA_PATH + 'poster_imgs') if isfile(join(DATA_PATH\
+             + 'poster_imgs', f))]
 files = pd.DataFrame(onlyfiles)
 files[0] = files[0].str[:-4]
 
-#%%
-movie_csv_path = '/Users/johnpentakalos/Posters/'
-movies_csv = pd.read_csv(movie_csv_path + 'movies_list.csv', encoding = "ISO-8859-1")
+#%%Cell 2
+movies_csv = pd.read_csv(DATA_PATH + 'movies_list.csv', encoding = "ISO-8859-1")
 movies_csv['id'] = movies_csv['movieid'].str[7:-1]
 
-#%%
+#%%Cell 3
 def convert_list(genre_list):
-    #print('made it here')
+    '''Returns genres as a python list cleaned'''
     if genre_list == None:
         return None
     return pd.Series(genre_list).str.strip().tolist()
-#%%
+#%%Cell 4
+#Performs an inner join between posters listed in movie_list and posters downloaded.
 merged = movies_csv.merge(files, left_on='id', right_on=0, how='inner')
 merged_df = merged.dropna(subset=['genre'])
 
@@ -30,14 +31,10 @@ merged_df['genre_new'] = merged_df.apply(lambda x: convert_list(x['genre']), axi
 GENRES = merged_df['genre_new'].apply(pd.Series).stack().value_counts().index.values
 GENRES = sorted(GENRES)
 
-#test = merged_df.iloc[65]['genre_new']
-#test
-#test = pd.Series(test).str.strip().tolist()
-
 movies = merged_df['genre_new']
 movies.index = merged_df.id
 
-#%%
+#%%Cell 5
 rows = []
 for item in movies.iteritems():
 #    if item[0] == 'tt0298148':
@@ -69,7 +66,6 @@ for item in movies.iteritems():
         new_df = pd.DataFrame([new_row], columns = GENRES)
     rows.append(new_df)
 #%%
-
 movie_genres = pd.concat(rows)
 movie_genres.index = merged_df.id
 #%%
